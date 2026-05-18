@@ -1,0 +1,30 @@
+# Data files — never commit patient data
+*.csv
+*.tsv
+viewer_data/
+patient_viewers/
+mabs_island_results/
+island_predictions/
+all_gbk_files/
+ATCC19977.FASTA/
+all_gffs/
+EOP.csv
+*.fasta
+*.fa
+*.fna
+*.gbk
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Snakemake
+.snakemake/
+logs/
+
+# OS
+.DS_Store
