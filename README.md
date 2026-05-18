@@ -36,9 +36,9 @@ pip install -e .
 ```bash
 # Single genome
 mabs-scan \
-    --fasta GD538.fasta \
-    --gff   GD538_prokka.gff \
-    --out   GD538_islands.tsv
+    --fasta SAMPLE.fasta \
+    --gff   SAMPLE_prokka.gff \
+    --out   SAMPLE_islands.tsv
 
 # Full cohort via Snakemake
 snakemake --configfile config.yaml --cores 8
@@ -50,7 +50,7 @@ snakemake --configfile config.yaml --cores 8
 |---|---|
 | `*_islands.tsv` | Per-strain island predictions with evidence lines |
 | `all_islands_combined.tsv` | Full cohort combined |
-| `catalog_strains.tsv` | Stable island IDs (GDxx_GI_001) |
+| `catalog_strains.tsv` | Stable island IDs (SAMPLE_GI_001) |
 | `catalog_groups.tsv` | Cross-strain group IDs (Mabs_GI_001) |
 | `patient_viewers/` | Self-contained HTML viewers per patient |
 
