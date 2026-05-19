@@ -189,10 +189,13 @@ FASTA files
 
 | Metric | Value |
 |---|---|
-| Strains processed | 250 / 253 abscessus (98.8%) |
-| Total islands detected | 8,617 |
-| Mean islands per genome | 34.5 (range 2–74) |
-| Defense islands | 829 (86 variable + 743 fixed) |
+| Strains processed | 312 / 316 across 3 subspecies (98.7%) |
+| — M. abscessus | 250 / 253 strains |
+| — M. massiliense | 54 / 55 strains |
+| — M. bolletii | 8 / 8 strains |
+| Total islands detected | 10,314 |
+| Mean islands per genome | 34.5 abscessus · 27.8 massiliense · 24.2 bolletii |
+| Defense islands (abscessus) | 829 (86 variable + 743 fixed) |
 | Increase over PPanGGOLiN alone | 864% |
 | BLAST-validated islands | 12 |
 | Sensitivity on known defense RGPs | 100% (86/86) |
