@@ -1,245 +1,298 @@
 # MAbsIslandScanner
 
-**Genomic island detection and annotation tool for *Mycobacteroides abscessus* clinical genomics**
+A bioinformatics pipeline for systematic genomic island detection, defense system characterization, and phage infection analysis across *Mycobacterium abscessus* clinical cohorts.
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+Developed at the University of Pittsburgh (Hatfull Lab) for analysis of 312 *M. abscessus* clinical isolates spanning three subspecies (*abscessus*, *massiliense*, *bolletii*).
 
 ---
 
 ## Overview
 
-MAbsIslandScanner identifies horizontally acquired genomic islands in *M. abscessus* using five independent evidence signals:
+MAbsIslandScanner integrates multiple genomic island prediction and defense system annotation tools into a unified Snakemake pipeline, producing per-patient interactive HTML viewers that link genomic island content to phage infection (EOP) data. It was developed to address questions about how horizontally acquired defense islands shape phage susceptibility in clinical *M. abscessus* infections.
 
-| Signal | Description | Threshold |
-|---|---|---|
-| GC content deviation | Absolute GC% difference from genome mean | > 1% |
-| Codon adaptation index (CAI) | CAI ratio relative to ribosomal protein reference set | ≤ 0.92 |
-| Mobility genes | Integrase, transposase, recombinase, XerC, RDF | ≥ 1 gene |
-| tRNA proximity | Integration within distance of a tRNA gene | ≤ 15 kb |
-| Direct repeats | Flanking direct repeat sequences (insertion scar) | 8–25 bp |
-
-Islands with **≥ 3 evidence lines** are retained at moderate or high confidence.
+**Key outputs:**
+- Catalog of 10,314 genomic islands across 312 strains with age estimates, HGT source, and transfer mechanism
+- Per-strain defense system calls (DefenseFinder + PADLOC) linked to island coordinates
+- 273 interactive patient HTML viewers with genome track, defense systems, EOP heatmap, and confidence filtering
+- TPP locus integrity assessment for each strain (relevant to Muddy/BPs phage receptor status)
+- TIR domain protein detection via Pfam PF01582 hmmscan
 
 ---
 
-## Key features
+## Repository structure
 
-- **Cohort-scale batch processing** via Snakemake (validated on 250 clinical genomes)
-- **Defense system intersection** with DefenseFinder output
-- **CAI-based age estimation** — very_recent / recent / moderate / old
-- **Cross-species BLAST validation** of mobility gene sequences
-- **Interactive patient longitudinal viewer** (self-contained HTML, no server required)
-- **100% sensitivity** on validated defense RGPs across 243 clinical isolates
-- **864% more islands** detected vs PPanGGOLiN comparative genomics alone
-
----
-
-## Dependencies
-
-### Core bioinformatics tools
-
-| Tool | Version tested | Purpose | Install |
-|---|---|---|---|
-| [Prokka](https://github.com/tseemann/prokka) | 1.14.6 | Genome annotation (GFF + FAA) | `conda install -c bioconda prokka` |
-| [PPanGGOLiN](https://github.com/labgem/PPanGGOLiN) | 1.2.74 | Pangenome + RGP detection | `conda install -c bioconda ppanggolin` |
-| [DefenseFinder](https://github.com/mdmparis/defense-finder) | 1.2.4 | Defense system annotation | `pip install mdmparis-defense-finder` |
-| [HMMER](http://hmmer.org/) | 3.4 | HMM profile search | `conda install -c bioconda hmmer` |
-| [BLAST+](https://blast.ncbi.nlm.nih.gov/) | 2.14.0 | Cross-species validation | `conda install -c bioconda blast` |
-| [Snakemake](https://snakemake.readthedocs.io/) | 7.32.4 | Workflow management | `conda install -c bioconda snakemake` |
-
-### Optional tools
-
-| Tool | Version tested | Purpose | Install |
-|---|---|---|---|
-| [PADLOC](https://github.com/padlocbio/padloc) | 2.0.0 | Additional defense system detection | `conda install -c bioconda padloc` |
-| [DefensePredictor](https://github.com/gempasteur/DefensePredictor) | 1.0 | ML-based defense gene prediction | See repo |
-| [PhiSpy](https://github.com/linsalrob/PhiSpy) | 4.2.21 | Prophage detection | `pip install phispy` |
-| [AntiDefenseFinder](https://github.com/mdmparis/defense-finder) | 1.0 | Anti-defense system detection | Integrated with DefenseFinder |
-
-### Python packages
-
-| Package | Version | Purpose |
-|---|---|---|
-| `biopython` | ≥ 1.79 | Sequence parsing (FASTA, GFF, GenBank) |
-| `numpy` | ≥ 1.21 | Numerical computations (GC, CAI) |
-| `pandas` | ≥ 1.3 | TSV/CSV handling |
-| `scipy` | ≥ 1.7 | Statistical analysis |
-| `matplotlib` | ≥ 3.4 | Visualization (optional) |
+```
+MAbsIslandScanner/
+├── Snakefile                        # Main pipeline
+├── config/
+│   └── config.yaml                  # Pipeline configuration
+├── workflow/
+│   ├── rules/                       # Snakemake rule modules
+│   └── scripts/
+│       ├── build_island_catalog.py  # Catalog 10,314 islands across strains
+│       ├── run_defensefinder.py     # DefenseFinder wrapper
+│       ├── run_padloc.py            # PADLOC wrapper
+│       ├── assign_island_age.py     # CAI-based age estimation
+│       ├── blast_validate.py        # Cross-strain BLAST validation
+│       └── generate_patient_viewers.py  # HTML viewer generation
+├── postprocessing/
+│   ├── patch_viewers.py             # Collapse fragmentation duplicates in viewers
+│   ├── update_viewer_ui.py          # Add confidence toggle, remove legend
+│   └── add_eop_to_viewers.py        # Inject EOP heatmap into viewers
+├── analysis/
+│   ├── tpp_pipeline.sh              # TPP locus BLAST pipeline
+│   ├── fetch_tpp_refs.sh            # Fetch TPP reference proteins
+│   ├── run_tpp_blast.sh             # BLAST all strains vs TPP locus
+│   ├── tpp_merge_eop.py             # Merge TPP status with EOP data
+│   └── tir_domain_search.sh         # Pfam PF01582 TIR domain hmmscan
+├── results/
+│   ├── fixed_defense_catalog_final.tsv      # Raw defense catalog
+│   ├── defense_catalog_collapsed.tsv        # Deduplicated catalog
+│   └── padloc_all_systems.csv               # PADLOC results all strains
+└── README.md
+```
 
 ---
 
 ## Installation
 
-### Recommended: conda environment
+### Dependencies
+
+```bash
+# Core pipeline
+conda create -n MAbsIslandScanner python=3.10
+conda activate MAbsIslandScanner
+conda install -c bioconda snakemake prokka hmmer blast
+conda install -c conda-forge pandas numpy
+
+# Defense system tools
+pip install defensefinder
+conda install -c bioconda padloc
+
+# PPanGGOLiN (genomic island detection)
+conda install -c bioconda ppanggolin
+```
+
+### Clone and configure
 
 ```bash
 git clone https://github.com/cmoyer-x/MAbsIslandScanner.git
 cd MAbsIslandScanner
-
-conda env create -f envs/mabs_islands.yaml
-conda activate mabs_islands
-pip install -e .
 ```
 
-### Manual install
+Edit `config/config.yaml` to set:
+- `faa_dir`: path to Prokka FAA files for your strains
+- `gff_dir`: path to Prokka GFF files
+- `genome_dir`: path to assembled FASTA files
+- `output_dir`: where results will be written
+
+---
+
+## Running the pipeline
 
 ```bash
-conda create -n mabs_islands python=3.10
-conda activate mabs_islands
+# Dry run first
+snakemake --dry-run --cores 16
 
-conda install -c bioconda -c conda-forge \
-    prokka=1.14.6 \
-    ppanggolin \
-    hmmer=3.4 \
-    blast=2.14.0 \
-    snakemake=7.32.4
+# Full run
+snakemake --cores 16 --use-conda
+```
 
-pip install mdmparis-defense-finder
-pip install biopython numpy pandas scipy
-pip install -e .
+### Individual steps
+
+**Generate patient HTML viewers:**
+```bash
+python workflow/scripts/generate_patient_viewers.py \
+    --defense_catalog results/fixed_defense_catalog_final.tsv \
+    --padloc          results/padloc_all_systems.csv \
+    --eop_csv         data/EOP.csv \
+    --out_dir         results/patient_viewers
 ```
 
 ---
 
-## Quick start
+## Postprocessing viewer scripts
 
-### Single genome
+These scripts update the HTML viewers after generation. Run them in order:
+
+### Step 1 — Collapse fragmentation duplicates
+
+Fragmented (draft) assemblies cause single genomic islands to appear as multiple entries with the same catalog group ID. This script collapses them, rescuing age/CAI signals from partial fragments:
 
 ```bash
-# Step 1: Annotate with Prokka
-prokka --outdir prokka_out --prefix GD538 \
-       --genus Mycobacteroides --species abscessus \
-       GD538.fasta
-
-# Step 2: Run scanner
-mabs-scan \
-    --fasta GD538.fasta \
-    --gff   prokka_out/GD538.gff \
-    --out   GD538_islands.tsv \
-    --min_ev 3
+python postprocessing/patch_viewers.py \
+    --viewer_dir results/patient_viewers \
+    --out_dir    results/patient_viewers_patched
 ```
 
-### Full cohort (Snakemake)
+**Logic:**
+- Groups catalog islands by `group_id` (e.g. `Mabs_GI_001`)
+- Prefers `unique` status entries over `trimmed` (contig-edge fragments)
+- Takes most recent age estimate from any fragment
+- Takes highest confidence from any fragment
+- Merges evidence strings
+- Adds `has_recent_cai` flag: `True` if any fragment had CAI deviation + recent age
+- Adds `n_contig_fragments` and `n_trimmed_fragments` counts
+
+### Step 2 — Update UI (remove legend, add confidence toggle)
 
 ```bash
-# Edit config.yaml to point to your genome directory
-snakemake --configfile config.yaml --cores 8
+python postprocessing/update_viewer_ui.py \
+    --viewer_dir results/patient_viewers_patched \
+    --out_dir    results/patient_viewers_ui
 ```
 
----
+**Changes:**
+- Removes the color legend from the bottom of each viewer
+- Adds a **GI confidence** toggle to the controls bar
+- Default view shows **high confidence** genomic islands only
+- Toggle switches to **high + moderate** for broader investigation
 
-## Pipeline overview
+### Step 3 — Add EOP heatmap
 
-```
-FASTA files
-    ├── Prokka ─────────────────► GFF + FAA
-    ├── PPanGGOLiN ─────────────► RGPs (variable islands)
-    ├── DefenseFinder ──────────► Defense system coordinates
-    └── MAbsIslandScanner
-            ├── GC deviation
-            ├── CAI (HMMER vs ribosomal HMMs)
-            ├── Mobility gene detection
-            ├── tRNA proximity
-            └── Direct repeat search
-                    ▼
-            Island TSVs per strain
-                    ▼
-            build_island_catalog.py ──► Stable IDs (Mabs_GI_001)
-                    ▼
-            intersect_denovo_defense.py ──► Defense island catalog
-                    ▼
-            build_patient_viewer.py ──► Interactive HTML viewers
+```bash
+python postprocessing/add_eop_to_viewers.py \
+    --viewer_dir results/patient_viewers_ui \
+    --eop_csv    data/EOP.csv \
+    --out_dir    results/patient_viewers_final
 ```
 
----
+**Adds a phage infection panel** below the genome track showing log₁₀ EOP values for each tested phage, grouped by family (Muddy, BPs, ZoeJ, other) and color-coded by infection efficiency.
 
-## Output files
-
-| File | Description |
-|---|---|
-| `*_islands.tsv` | Per-strain predictions with 5 evidence signals |
-| `all_islands_combined.tsv` | Full cohort combined |
-| `catalog/catalog_strains.tsv` | Stable strain-level IDs (GDxx_GI_001) |
-| `catalog/catalog_groups.tsv` | Cross-strain group IDs (Mabs_GI_001) |
-| `denovo_defense_intersection.tsv` | Fixed defense islands |
-| `fixed_defense_catalog_final.tsv` | Full catalog with BLAST validation + age estimates |
-| `patient_viewers/` | Self-contained HTML viewers per patient |
-
-### Island TSV columns
-
-| Column | Description |
-|---|---|
-| `island_id` | Stable ID (e.g. GD538_GI_010) |
-| `start`, `end`, `length` | Chromosomal coordinates (bp) |
-| `n_evidence` | Number of evidence lines (2–5) |
-| `confidence` | low / moderate / high |
-| `age_estimate` | very_recent / recent / moderate / old |
-| `cai_ratio` | CAI relative to host ribosomal proteins |
-| `dominant_cargo` | defense / mobility / metal / efflux / regulatory / hypothetical |
-| `trna_flanked` | Boolean — integration at tRNA locus |
-| `has_dr` | Boolean — direct repeat detected |
-| `mob_types` | Mobility gene types detected |
-| `blast_validated` | Boolean — cross-species BLAST confirmation |
-| `blast_hit_species` | Species with homologous mobility genes |
+| Color | EOP range | Interpretation |
+|-------|-----------|----------------|
+| Bright green | 0 to −1 | Productive infection |
+| Light green | −1 to −3 | Low productive |
+| Amber | −3 to −5 | Intermediate |
+| Red | −5 to −7 | Resistant |
+| Dark red | below −7 | Highly resistant |
+| Grey | — | Not tested |
 
 ---
 
-## Performance (250 M. abscessus clinical isolates)
+## TPP locus analysis
 
-| Metric | Value |
-|---|---|
-| Strains processed | 312 / 316 across 3 subspecies (98.7%) |
-| — M. abscessus | 250 / 253 strains |
-| — M. massiliense | 54 / 55 strains |
-| — M. bolletii | 8 / 8 strains |
-| Total islands detected | 10,314 |
-| Mean islands per genome | 34.5 abscessus · 27.8 massiliense · 24.2 bolletii |
-| Defense islands (abscessus) | 829 (86 variable + 743 fixed) |
-| Increase over PPanGGOLiN alone | 864% |
-| BLAST-validated islands | 12 |
-| Sensitivity on known defense RGPs | 100% (86/86) |
-| Direct repeat detection rate | 75.9% of known defense RGPs |
-| tRNA proximity enrichment | 19.8% vs ~2–3% expected |
+The trehalose polyphleate (TPP) biosynthesis locus is the primary receptor for phages Muddy and BPs (Wetzel et al. 2023, *Nature Microbiology*). This pipeline assesses TPP integrity across all sequenced strains.
+
+**Five TPP locus genes (ATCC 19977 reference):**
+
+| Gene | Function |
+|------|----------|
+| MAB_0939 (Pks) | Polyketide synthase — builds phleic acid chains |
+| MAB_0940 (PE) | Transacylase — transfers phleic acids onto DAT |
+| MAB_0941 (PapA3) | Acyltransferase — forms diacyltrehalose precursor |
+| MAB_0942 (MmpL10) | Transporter — exports DAT across membrane |
+| MAB_0943 (FadD23) | Fatty acyl-AMP ligase — activates fatty acid substrate |
+
+```bash
+# Fetch reference proteins (uses UniProt REST API)
+python3 << 'PYEOF'
+import urllib.request, time, re
+OUT = "analysis/tpp_reference.faa"
+entries = [("B1MB11","MAB_0939_Pks"),("B1MB12","MAB_0940_PE"),
+           ("B1MB13","MAB_0941_PapA3"),("B1MB14","MAB_0942_MmpL10"),
+           ("B1MB15","MAB_0943_FadD23")]
+with open(OUT,'w') as out:
+    for acc, label in entries:
+        url = f"https://rest.uniprot.org/uniprotkb/{acc}.fasta"
+        with urllib.request.urlopen(url, timeout=30) as r:
+            fasta = r.read().decode()
+        lines = fasta.strip().split('\n')
+        out.write(f">{label}\n{''.join(lines[1:])}\n")
+        time.sleep(0.3)
+PYEOF
+
+# Run BLAST pipeline
+bash analysis/run_tpp_blast.sh \
+    --faa_dir /path/to/prokka_faa_files \
+    --out_dir analysis/tpp_results \
+    --threads 8
+
+# Merge with EOP data
+python analysis/tpp_merge_eop.py \
+    --tpp  analysis/tpp_results/tpp_status_per_strain.tsv \
+    --eop  data/EOP.csv \
+    --out  analysis/tpp_results/merged_tpp_eop.tsv
+```
+
+**TPP status classifications:**
+- `intact` — all 5 genes present at ≥80% identity and ≥80% query coverage
+- `partial` — 3–4 genes intact
+- `disrupted` — 1–2 genes found but degraded
+- `absent` — no TPP genes detected
 
 ---
 
-## Tool comparison — GD538
+## TIR domain detection
 
-| Feature | IslandViewer 4 | MAbsIslandScanner |
-|---|---|---|
-| CBASS_II island | 2 fragments (88% + 4 kb orphan) | 1 coherent 65 kb island |
-| Hna island | 5 fragments (53% max overlap) | 1 coherent 103 kb island |
-| Defense annotation | None | Teal = defense cargo |
-| Age estimate | None | very_recent / recent / old |
-| Mechanism | None | integrase / transposase / XerC |
-| Evidence score | None | 3–5 independent lines |
-| Organism calibration | Gram-negative (40–55% GC) | *M. abscessus* (64% GC) |
-| Cohort scale | Single genome | 250 genomes · Snakemake |
+TIR (Toll/interleukin-1 receptor) domain proteins are standalone anti-phage defense systems not covered by DefenseFinder or PADLOC. This pipeline detects them via Pfam `PF01582`:
 
-IslandViewer 4: Bertelli et al. *Nucleic Acids Res* 2017; 45:W30–W35.
+```bash
+bash analysis/tir_domain_search.sh \
+    --faa_dir  /path/to/all_faa_files \
+    --out_dir  analysis/tir_results \
+    --threads  8
+```
+
+Requires `hmmer` (hmmscan). Downloads `PF01582.hmm` from the EBI Pfam API automatically.
+
+**Output:** `tir_results/tir_hits.tsv` — strain, protein ID, e-value, score, domain coordinates.
+
+---
+
+## Key biological findings
+
+### Defense island prevalence
+- 829 defense-carrying islands identified across 312 strains
+- 16 strains carry the hsdSMR + CBASS_type_I co-localized island first described in GD272/GD276A by Cristinziano et al. (2024, *Nature Communications*)
+- Island prevalence: 5.1% of strains carry the BPs-restricting hsdSMR island
+
+### Phage susceptibility by subspecies
+| Subspecies | % susceptible | % defense-resistant |
+|-----------|--------------|---------------------|
+| *M. massiliense* | 38% | 36% |
+| *M. abscessus* subsp. *abscessus* | 28% | 58% |
+
+### Longitudinal HGT
+GD233 acquired RM_IIG_2 via cross-subspecies HGT from *M. massiliense/bolletii* during infection (concurrent with VP1853 loss), demonstrating that defense island acquisition can occur **during** phage therapy, a dynamic not addressed by prior cross-sectional studies.
+
+### Anti-RM gene in Muddy
+PBI_MUDDY_41 (218 aa) contains an N-terminal OB-fold (HHpred PrgE hit, 99.8% probability) and a C-terminal polyacidic tail (net charge −31), consistent with a dual-mechanism anti-RM protein. Maco6 carries a 97% identical homolog yet shows substantially lower EOP on certain strains, implicating additional anti-defense genes unique to Muddy.
+
+---
+
+## Dependencies and versions
+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| PPanGGOLiN | ≥2.0 | Genomic island detection |
+| DefenseFinder | ≥1.3 | Defense system annotation |
+| PADLOC | ≥2.0 | Defense system annotation |
+| BLAST+ | ≥2.12 | Sequence similarity |
+| HMMER | ≥3.3 | TIR/TPP domain search |
+| Prokka | ≥1.14 | Genome annotation |
+| Python | ≥3.10 | Pipeline scripts |
+| pandas | ≥2.0 | Data processing |
 
 ---
 
 ## Citation
 
-Moyer et al. (in preparation). MAbsIslandScanner: a genomic island detection and annotation tool for *Mycobacteroides abscessus* clinical cohorts. University of Pittsburgh.
+If you use MAbsIslandScanner, please cite:
 
-Please also cite:
-- **PPanGGOLiN**: Gautreau et al. *PLOS Comput Biol* 2020
-- **DefenseFinder**: Tesson et al. *Nat Commun* 2022
-- **Prokka**: Seemann. *Bioinformatics* 2014; 30(14):2068–2069
-- **HMMER**: Eddy. *PLOS Comput Biol* 2011
+> Moyer CL, et al. *Genomic island-mediated defense system acquisition shapes phage susceptibility in clinical Mycobacterium abscessus.* (in preparation)
 
----
-
-## License
-
-MIT — see [LICENSE](LICENSE)
+Please also cite the underlying tools: PPanGGOLiN, DefenseFinder, PADLOC, and HMMER.
 
 ---
 
 ## Contact
 
-Casey Moyer · Research Scientist · University of Pittsburgh  
+Casey Moyer — Research Scientist, University of Pittsburgh  
 GitHub: [@cmoyer-x](https://github.com/cmoyer-x)
+
+---
+
+## License
+
+MIT License. See `LICENSE` for details.
