@@ -11,10 +11,10 @@ Developed at the University of Pittsburgh (Hatfull Lab) for analysis of 312 *M. 
 GIMa integrates multiple genomic island prediction and defense system annotation tools into a unified Snakemake pipeline, producing per-patient interactive HTML viewers that link genomic island content to phage infection (EOP) data. It was developed to address questions about how horizontally acquired defense islands shape phage susceptibility in clinical *M. abscessus* infections.
 
 **Key outputs:**
-- Catalog of 10,314 genomic islands across 312 strains with age estimates, HGT source, and transfer mechanism
+- Catalog of genomic islands across your strains with age estimates, HGT source, and transfer mechanism
 - Per-strain defense system calls (DefenseFinder + PADLOC) linked to island coordinates
-- 273 interactive patient HTML viewers with genome track, defense systems, EOP heatmap, and confidence filtering
-- TPP locus integrity assessment for each strain (relevant to Muddy/BPs phage receptor status)
+- Per-strain interactive patient HTML viewers with genome track, defense systems, EOP heatmap, and confidence filtering
+- TPP locus integrity assessment for each strain
 - TIR domain protein detection via Pfam PF01582 hmmscan
 
 ---
