@@ -1,5 +1,5 @@
 # =============================================================================
-# MAbsIslandScanner — Snakemake Workflow
+# GIMa — Snakemake Workflow
 # =============================================================================
 #
 # Component 2: Genomic island scanning, catalog building, and viewer
@@ -405,7 +405,7 @@ rule report:
         strains = len(set(r["strain"] for r in islands))
 
         print("\n" + "="*50)
-        print("MAbsIslandScanner — Run Report")
+        print("GIMa — Run Report")
         print("="*50)
         print(f"Strains processed:    {strains}")
         print(f"Total islands:        {len(islands):,}")

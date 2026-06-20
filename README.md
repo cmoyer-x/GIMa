@@ -1,4 +1,4 @@
-# MAbsIslandScanner
+# GIMa
 
 A bioinformatics pipeline for systematic genomic island detection, defense system characterization, and phage infection analysis across *Mycobacterium abscessus* clinical cohorts.
 
@@ -8,7 +8,7 @@ Developed at the University of Pittsburgh (Hatfull Lab) for analysis of 312 *M. 
 
 ## Overview
 
-MAbsIslandScanner integrates multiple genomic island prediction and defense system annotation tools into a unified Snakemake pipeline, producing per-patient interactive HTML viewers that link genomic island content to phage infection (EOP) data. It was developed to address questions about how horizontally acquired defense islands shape phage susceptibility in clinical *M. abscessus* infections.
+GIMa integrates multiple genomic island prediction and defense system annotation tools into a unified Snakemake pipeline, producing per-patient interactive HTML viewers that link genomic island content to phage infection (EOP) data. It was developed to address questions about how horizontally acquired defense islands shape phage susceptibility in clinical *M. abscessus* infections.
 
 **Key outputs:**
 - Catalog of 10,314 genomic islands across 312 strains with age estimates, HGT source, and transfer mechanism
@@ -22,7 +22,7 @@ MAbsIslandScanner integrates multiple genomic island prediction and defense syst
 ## Repository structure
 
 ```
-MAbsIslandScanner/
+GIMa/
 ├── Snakefile                        # Main pipeline
 ├── config/
 │   └── config.yaml                  # Pipeline configuration
@@ -60,8 +60,8 @@ MAbsIslandScanner/
 
 ```bash
 # Core pipeline
-conda create -n MAbsIslandScanner python=3.10
-conda activate MAbsIslandScanner
+conda create -n GIMa python=3.10
+conda activate GIMa
 conda install -c bioconda snakemake prokka hmmer blast
 conda install -c conda-forge pandas numpy
 
@@ -76,8 +76,8 @@ conda install -c bioconda ppanggolin
 ### Clone and configure
 
 ```bash
-git clone https://github.com/cmoyer-x/MAbsIslandScanner.git
-cd MAbsIslandScanner
+git clone https://github.com/cmoyer-x/GIMa.git
+cd GIMa
 ```
 
 Edit `config/config.yaml` to set:
@@ -278,7 +278,7 @@ PBI_MUDDY_41 (218 aa) contains an N-terminal OB-fold (HHpred PrgE hit, 99.8% pro
 
 ## Citation
 
-If you use MAbsIslandScanner, please cite:
+If you use GIMa, please cite:
 
 > Moyer CL, et al. *Genomic island-mediated defense system acquisition shapes phage susceptibility in clinical Mycobacterium abscessus.* (in preparation)
 

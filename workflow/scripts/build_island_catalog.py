@@ -34,7 +34,7 @@ def parse_args():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--islands",  required=True,
-                   help="all_islands_combined.tsv from MAbsIslandScanner")
+                   help="all_islands_combined.tsv from GIMa")
     p.add_argument("--defense",  default=None,
                    help="denovo_defense_intersection.tsv")
     p.add_argument("--amr_dir",  default=None,

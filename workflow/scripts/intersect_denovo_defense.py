@@ -1,7 +1,7 @@
 """
 intersect_denovo_defense.py
 
-Intersects de novo genomic islands (found by MAbsIslandScanner but NOT
+Intersects de novo genomic islands (found by GIMa but NOT
 anchored to PPanGGOLiN RGPs) with DefenseFinder system coordinates to
 identify defense systems in fixed islands — acquisitions present in too
 many strains to appear as RGPs but still carrying detectable HGT evidence.
@@ -27,7 +27,7 @@ def parse_args():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--islands",   required=True,
-                   help="all_islands_combined.tsv from MAbsIslandScanner")
+                   help="all_islands_combined.tsv from GIMa")
     p.add_argument("--defense",   required=True,
                    help="DefenseFinder systems TSV (all_genomes_defense_finder_systems.tsv)")
     p.add_argument("--gff_dir",   required=True,
@@ -388,7 +388,7 @@ def build_html(results, in_denovo, sys_types, age_dist, outpath, min_conf='moder
 </head>
 <body>
 <h1>Fixed defense islands — de novo intersection</h1>
-<p class="sub">Defense systems in genomic islands invisible to PPanGGOLiN · MAbsIslandScanner de novo predictions · M. abscessus</p>
+<p class="sub">Defense systems in genomic islands invisible to PPanGGOLiN · GIMa de novo predictions · M. abscessus</p>
 
 <div class="stats">
   <div class="stat"><div class="sv">{len(results):,}</div><div class="sl">Total defense systems</div></div>
@@ -430,7 +430,7 @@ def build_html(results, in_denovo, sys_types, age_dist, outpath, min_conf='moder
   regions of genomic plasticity (RGPs) in PPanGGOLiN. They were acquired by HGT in an
   ancestral strain and have since spread through the clinical population — or have been
   present so long they are now fixed. These islands are invisible to any comparative
-  genomics approach but are detectable by MAbsIslandScanner's compositional and structural
+  genomics approach but are detectable by GIMa's compositional and structural
   evidence signals. The count here represents the lower bound — only islands with
   ≥{min_conf} confidence and ≥2 evidence lines are reported.
 </div>

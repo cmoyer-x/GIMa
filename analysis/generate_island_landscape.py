@@ -330,7 +330,7 @@ def main():
         description='Generate defense-carrying genomic island landscape figure.'
     )
     parser.add_argument('--islands_tsv', default='catalog_strains.tsv',
-                        help='MAbsIslandScanner catalog TSV')
+                        help='GIMa catalog TSV')
     parser.add_argument('--master_csv',  default='mabs_cohort_master.csv')
     parser.add_argument('--output',      default='genomic_island_landscape.png')
     parser.add_argument('--dpi',         type=int, default=200)

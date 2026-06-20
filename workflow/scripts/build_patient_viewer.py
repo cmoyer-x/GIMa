@@ -59,7 +59,7 @@ def parse_args():
     p.add_argument("--island_catalog",      default=None,
                    help="island_viewer_data.json from build_island_catalog.py")
     p.add_argument("--scanner_islands",    default=None,
-                   help="all_islands_combined.tsv from MAbsIslandScanner")
+                   help="all_islands_combined.tsv from GIMa")
     p.add_argument("--denovo_defense",     default=None,
                    help="denovo_defense_intersection.tsv for fixed defense islands")
     p.add_argument("--trna_proximity_mass", default=None,
@@ -1564,7 +1564,7 @@ def parse_args():
     p.add_argument("--island_catalog",      default=None,
                    help="island_viewer_data.json from build_island_catalog.py")
     p.add_argument("--scanner_islands",    default=None,
-                   help="all_islands_combined.tsv from MAbsIslandScanner")
+                   help="all_islands_combined.tsv from GIMa")
     p.add_argument("--denovo_defense",     default=None,
                    help="denovo_defense_intersection.tsv for fixed defense islands")
     p.add_argument("--trna_proximity_mass", default=None,
