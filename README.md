@@ -2,7 +2,7 @@
 
 A bioinformatics pipeline for systematic genomic island detection, defense system characterization, and phage infection analysis across *Mycobacterium abscessus* clinical cohorts.
 
-Developed at the University of Pittsburgh (Hatfull Lab) for analysis of 312 *M. abscessus* clinical isolates spanning three subspecies (*abscessus*, *massiliense*, *bolletii*).
+Developed at the University of Pittsburgh (Hatfull Lab) for analysis of *M. abscessus* clinical isolates spanning three subspecies (*abscessus*, *massiliense*, *bolletii*).
 
 ---
 
@@ -29,7 +29,7 @@ GIMa/
 ├── workflow/
 │   ├── rules/                       # Snakemake rule modules
 │   └── scripts/
-│       ├── build_island_catalog.py  # Catalog 10,314 islands across strains
+│       ├── build_island_catalog.py  # Build genomic island catalog across strains
 │       ├── run_defensefinder.py     # DefenseFinder wrapper
 │       ├── run_padloc.py            # PADLOC wrapper
 │       ├── assign_island_age.py     # CAI-based age estimation
@@ -240,24 +240,9 @@ Requires `hmmer` (hmmscan). Downloads `PF01582.hmm` from the EBI Pfam API automa
 
 ---
 
-## Key biological findings
+## Biological findings
 
-### Defense island prevalence
-- 829 defense-carrying islands identified across 312 strains
-- 16 strains carry the hsdSMR + CBASS_type_I co-localized island first described in GD272/GD276A by Cristinziano et al. (2024, *Nature Communications*)
-- Island prevalence: 5.1% of strains carry the BPs-restricting hsdSMR island
-
-### Phage susceptibility by subspecies
-| Subspecies | % susceptible | % defense-resistant |
-|-----------|--------------|---------------------|
-| *M. massiliense* | 38% | 36% |
-| *M. abscessus* subsp. *abscessus* | 28% | 58% |
-
-### Longitudinal HGT
-GD233 acquired RM_IIG_2 via cross-subspecies HGT from *M. massiliense/bolletii* during infection (concurrent with VP1853 loss), demonstrating that defense island acquisition can occur **during** phage therapy, a dynamic not addressed by prior cross-sectional studies.
-
-### Anti-RM gene in Muddy
-PBI_MUDDY_41 (218 aa) contains an N-terminal OB-fold (HHpred PrgE hit, 99.8% probability) and a C-terminal polyacidic tail (net charge −31), consistent with a dual-mechanism anti-RM protein. Maco6 carries a 97% identical homolog yet shows substantially lower EOP on certain strains, implicating additional anti-defense genes unique to Muddy.
+GIMa was developed and applied to a clinical *M. abscessus* cohort. Detailed biological findings from that work — covering defense island prevalence, subspecies-level phage susceptibility, longitudinal horizontal gene transfer, and anti-restriction protein characterization — will be reported in a forthcoming publication (Moyer et al., in preparation).
 
 ---
 
