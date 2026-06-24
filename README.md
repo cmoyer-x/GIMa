@@ -242,7 +242,7 @@ Requires `hmmer` (hmmscan). Downloads `PF01582.hmm` from the EBI Pfam API automa
 
 ## Biological findings
 
-GIMa was developed and applied to a clinical *M. abscessus* cohort. Detailed biological findings from that work — covering defense island prevalence, subspecies-level phage susceptibility, longitudinal horizontal gene transfer, and anti-restriction protein characterization — will be reported in a forthcoming publication (Moyer et al., in preparation).
+GIMa was developed and applied to a clinical *M. abscessus* cohort. Detailed biological findings from that work — covering defense island prevalence, subspecies-level phage susceptibility, longitudinal horizontal gene transfer, and anti-restriction protein characterization.
 
 ---
 
@@ -265,7 +265,7 @@ GIMa was developed and applied to a clinical *M. abscessus* cohort. Detailed bio
 
 If you use GIMa, please cite:
 
-> Moyer CL, et al. *Genomic island-mediated defense system acquisition shapes phage susceptibility in clinical Mycobacterium abscessus.* (in preparation)
+> Moyer CL, et al. GIMA
 
 Please also cite the underlying tools: PPanGGOLiN, DefenseFinder, PADLOC, and HMMER.
 
