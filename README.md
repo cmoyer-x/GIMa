@@ -66,7 +66,7 @@ conda install -c bioconda snakemake prokka hmmer blast
 conda install -c conda-forge pandas numpy
 
 # Defense system tools
-pip install defensefinder
+pip install mdmparis-defense-finder
 conda install -c bioconda padloc
 
 # PPanGGOLiN (genomic island detection)
