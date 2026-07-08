@@ -22,50 +22,62 @@ genome and blur RGP boundaries.
 ## Requirements
 
 - PPanGGOLiN 2.3.0 (in the `GIMa` conda environment)
-- Per-strain Prokka GFF files (with the `##FASTA` section, which Prokka
-  includes by default). Located in this project under
-  `cohort/genomes/<strain>/prokka/<strain>.gff`.
-- A cohort master CSV with a `subspecies` column giving the correct
-  subspecies assignment per strain.
+- Per-strain Prokka output for every genome. GIMa uses the Prokka `.gff`
+  (which includes the genome sequence in a `##FASTA` block by default).
+- One strain-list file per subspecies (see Step 1). PPanGGOLiN is run
+  separately per subspecies, so RGP boundaries are not blurred by mixing
+  divergent genomes.
 
-> **Note on subspecies assignments.** Group strains using the **master CSV's
-> `subspecies` column**, not any older MASH `subspecies_assignments.tsv` that
-> predates the bolletii-reference correction. The corrected cohort split is
-> 290 abscessus / 76 massiliense / 10 bolletii.
+This document assumes you have already run Prokka on each assembly, e.g.:
+
+```bash
+prokka --outdir prokka/<strain> --prefix <strain> --cpus 8 <strain>.fasta
+```
+
+giving a `prokka/<strain>/<strain>.gff` per genome.
 
 ---
 
-## Step 1 — group strains by subspecies
+## Step 1 — assign each genome to a subspecies
 
-Write one strain-list file per subspecies from the master CSV:
+PPanGGOLiN must be run once per subspecies (*abscessus*, *massiliense*,
+*bolletii*). Assign each genome by MASH distance to the three subspecies
+reference genomes, then write one strain-list file per subspecies
+(`abscessus_strains.txt`, `massiliense_strains.txt`, `bolletii_strains.txt`),
+one strain name per line.
 
 ```bash
-python3 - <<'PY'
-import csv
-rows = list(csv.DictReader(open('data/mabs_cohort_master.csv', encoding='utf-8-sig')))
-def is_mab(r):
-    return (r.get('species') or '').strip() in (
-        'M. abscessus', 'Mycobacteroides abscessus', 'abscessus')
-def sequenced(r):
-    return (r.get('sequenced') or '').upper() in ('TRUE', 'YES', '1')
-for sub in ('abscessus', 'massiliense', 'bolletii'):
-    strains = [r['strain'] for r in rows
-               if is_mab(r) and sequenced(r)
-               and (r.get('subspecies') or '').strip() == sub]
-    open(f'{sub}_strains.txt', 'w').write('\n'.join(strains) + '\n')
-    print(f'{sub}: {len(strains)} strains')
-PY
+mash sketch -o refs \
+    abscessus_ref.fasta massiliense_ref.fasta bolletii_ref.fasta
+for asm in assemblies/*.fasta; do
+    s=$(basename "$asm" .fasta)
+    nearest=$(mash dist refs.msh "$asm" \
+              | sort -k3,3g | head -1 | cut -f1)
+    case "$nearest" in
+        *abscessus*)   echo "$s" >> abscessus_strains.txt ;;
+        *massiliense*) echo "$s" >> massiliense_strains.txt ;;
+        *bolletii*)    echo "$s" >> bolletii_strains.txt ;;
+    esac
+done
+wc -l *_strains.txt
 ```
 
-Expected: `abscessus: 290`, `massiliense: 76`, `bolletii: 10`.
+Use a correct *bolletii* reference; an incorrect one causes bolletii genomes to
+be misassigned to *abscessus* or *massiliense*. If you already have subspecies
+assignments from another workflow, just produce the three `*_strains.txt` files
+by whatever means and skip this step.
 
 ## Step 2 — stage GFFs into a flat per-subspecies directory
 
+Point `PROKKA_DIR` at wherever your per-strain Prokka GFFs live. This example
+assumes `prokka/<strain>/<strain>.gff`.
+
 ```bash
+PROKKA_DIR=prokka
 for sub in abscessus massiliense bolletii; do
     mkdir -p pangenome_input/$sub
     while read s; do
-        gff="cohort/genomes/$s/prokka/$s.gff"
+        gff="$PROKKA_DIR/$s/$s.gff"
         [ -f "$gff" ] && cp "$gff" "pangenome_input/$sub/$s.gff" \
                       || echo "MISSING: $gff"
     done < ${sub}_strains.txt
@@ -73,8 +85,9 @@ for sub in abscessus massiliense bolletii; do
 done
 ```
 
-Any `MISSING` line indicates a strain whose Prokka GFF was not found — resolve
-before proceeding.
+Any `MISSING` line indicates a strain whose Prokka GFF was not found at the
+expected path — adjust `PROKKA_DIR` or the filename pattern to match your
+layout.
 
 ## Step 3 — build the PPanGGOLiN annotation list per subspecies
 

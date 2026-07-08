@@ -7,47 +7,35 @@ build_pangenomes.sh
 Generates the per-subspecies PPanGGOLiN inputs that GIMa (Component 2)
 consumes: regions_of_genomic_plasticity.tsv and spots.tsv per subspecies.
 
-Component 1 for GIMa. Groups strains by subspecies from the cohort master,
-stages Prokka GFFs, and runs the PPanGGOLiN chain
-(workflow -> rgp -> spot -> write_pangenome) once per subspecies.
+Component 1 for GIMa. Stages Prokka GFFs per subspecies and runs the
+PPanGGOLiN chain (workflow -> rgp -> spot -> write_pangenome) once per
+subspecies.
 
 Prerequisites:
   - PPanGGOLiN 2.3.0 (conda env "GIMa")
-  - Per-strain Prokka GFFs at cohort/genomes/<strain>/prokka/<strain>.gff
-  - Cohort master CSV with a "subspecies" column
+  - Per-strain Prokka GFFs (default layout: prokka/<strain>/<strain>.gff)
+  - One strain-list file per subspecies, one strain name per line:
+      abscessus_strains.txt, massiliense_strains.txt, bolletii_strains.txt
+    (assign genomes to subspecies however you like, e.g. MASH to references)
 
 Usage:
   conda activate GIMa
   ./build_pangenomes.sh                         run all three subspecies
   ./build_pangenomes.sh bolletii                run one subspecies
-  MASTER=data/mabs_cohort_master.csv ./build_pangenomes.sh
+  PROKKA_DIR=path/to/prokka ./build_pangenomes.sh
 
 Environment:
-  MASTER     path to cohort master CSV   (default: data/mabs_cohort_master.csv)
-  GENOMES    per-strain genomes root     (default: cohort/genomes)
-  CPU        threads for workflow step   (default: 8)
+  PROKKA_DIR   per-strain Prokka root         (default: prokka)
+  GFF_PATTERN  gff path within PROKKA_DIR      (default: <s>/<s>.gff)
+  CPU          threads for workflow step       (default: 8)
 DOC
 
-MASTER="${MASTER:-data/mabs_cohort_master.csv}"
-GENOMES="${GENOMES:-cohort/genomes}"
+PROKKA_DIR="${PROKKA_DIR:-prokka}"
 CPU="${CPU:-8}"
 
-write_strain_lists () {
-    python3 - "$MASTER" <<'PY'
-import csv, sys
-rows = list(csv.DictReader(open(sys.argv[1], encoding='utf-8-sig')))
-def is_mab(r):
-    return (r.get('species') or '').strip() in (
-        'M. abscessus', 'Mycobacteroides abscessus', 'abscessus')
-def sequenced(r):
-    return (r.get('sequenced') or '').upper() in ('TRUE', 'YES', '1')
-for sub in ('abscessus', 'massiliense', 'bolletii'):
-    strains = [r['strain'] for r in rows
-               if is_mab(r) and sequenced(r)
-               and (r.get('subspecies') or '').strip() == sub]
-    open(f'{sub}_strains.txt', 'w').write('\n'.join(strains) + '\n')
-    print(f'{sub}: {len(strains)} strains', file=sys.stderr)
-PY
+resolve_gff () {
+    local s=$1
+    echo "$PROKKA_DIR/$s/$s.gff"
 }
 
 stage_gffs () {
@@ -56,7 +44,8 @@ stage_gffs () {
     local missing=0
     while read -r s; do
         [ -z "$s" ] && continue
-        local gff="$GENOMES/$s/prokka/$s.gff"
+        local gff
+        gff=$(resolve_gff "$s")
         if [ -f "$gff" ]; then
             cp "$gff" "pangenome_input/$sub/$s.gff"
         else
@@ -116,7 +105,12 @@ process_subspecies () {
 }
 
 main () {
-    write_strain_lists
+    for sub in "${@:-bolletii massiliense abscessus}"; do
+        if [ ! -f "${sub}_strains.txt" ]; then
+            echo "ERROR: ${sub}_strains.txt not found (see Step 1 in docs)" >&2
+            exit 1
+        fi
+    done
     if [ "$#" -ge 1 ]; then
         for sub in "$@"; do
             process_subspecies "$sub"

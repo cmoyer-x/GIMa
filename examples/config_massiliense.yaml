@@ -1,0 +1,26 @@
+fasta_dir: "/home/pbi/Cohort_Stats/gima_run/massiliense/fasta"
+gff_dir:   "/home/pbi/Cohort_Stats/gima_run/massiliense/gff"
+
+rgp_file: "/home/pbi/Cohort_Stats/massiliense_pangenome/rgp_output/regions_of_genomic_plasticity.tsv"
+
+defense_systems: "/home/pbi/Cohort_Stats/all_genomes_defense_finder_systems.tsv"
+defense_intersection: "/home/pbi/Cohort_Stats/gima_run/massiliense/out/denovo_defense_intersection.tsv"
+genome_stats: "/home/pbi/Cohort_Stats/massiliense_pangenome/genomes_statistics.tsv"
+
+out_dir: "/home/pbi/Cohort_Stats/gima_run/massiliense/out"
+
+rgp_extend: 5000
+min_evidence: 2
+catalog_min_evidence: 3
+window_size: 8000
+step_size: 2000
+min_confidence: "moderate"
+
+blast_confidence: "high"
+blast_flank: 500
+
+scanner_script:   "/home/pbi/Cohort_Stats/GIMa/workflow/scripts/scanner.py"
+intersect_script: "/home/pbi/Cohort_Stats/GIMa/workflow/scripts/intersect_denovo_defense.py"
+catalog_script:   "/home/pbi/Cohort_Stats/GIMa/workflow/scripts/build_island_catalog.py"
+viewer_script:    "/home/pbi/Cohort_Stats/GIMa/workflow/scripts/build_patient_viewer.py"
+extract_script:   "/home/pbi/Cohort_Stats/GIMa/workflow/scripts/extract_fixed_island_seqs.py"
