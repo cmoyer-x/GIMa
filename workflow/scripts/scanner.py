@@ -122,8 +122,12 @@ def classify_mobility(product, gene=""):
 
 def is_ribosomal(product):
     prod = product.lower()
+    if "methyltransferase" in prod or "pseudouridine" in prod or "biogenesis" in prod:
+        return False
     return any(k in prod for k in
-               ["ribosomal protein", "30s ribosomal", "50s ribosomal", "rps", "rpl"])
+               ["ribosomal protein", "ribosomal subunit protein",
+                "30s ribosomal", "50s ribosomal",
+                "small subunit protein", "large subunit protein"])
 
 
 # ── FASTA loading ─────────────────────────────────────────────────────────────

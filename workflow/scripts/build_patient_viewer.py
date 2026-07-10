@@ -71,9 +71,9 @@ def parse_args():
     p.add_argument("--trna_proximity",     default=None,
                    help="rgp_trna_proximity.tsv (optional)")
     p.add_argument("--genome_stats",      required=True)
-    p.add_argument("--padloc",            required=True)
-    p.add_argument("--defense_predictor", required=True)
-    p.add_argument("--prophage_dir",      required=True,
+    p.add_argument("--padloc",            default=None)
+    p.add_argument("--defense_predictor", default=None)
+    p.add_argument("--prophage_dir",      default=None,
                    help="Directory containing per-genome Depht HTML files (e.g. GD05.html)")
     p.add_argument("--outfile",           default="patient_comparison_viewer.html")
     return p.parse_args()
@@ -1576,9 +1576,9 @@ def parse_args():
     p.add_argument("--trna_proximity",     default=None,
                    help="rgp_trna_proximity.tsv (optional)")
     p.add_argument("--genome_stats",      required=True)
-    p.add_argument("--padloc",            required=True)
-    p.add_argument("--defense_predictor", required=True)
-    p.add_argument("--prophage_dir",      required=True,
+    p.add_argument("--padloc",            default=None)
+    p.add_argument("--defense_predictor", default=None)
+    p.add_argument("--prophage_dir",      default=None,
                    help="Directory containing per-genome Depht HTML files (e.g. GD05.html)")
     p.add_argument("--outfile",           default="patient_comparison_viewer.html")
     return p.parse_args()
