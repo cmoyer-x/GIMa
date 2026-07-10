@@ -315,10 +315,21 @@ def annotate_cargo(island, genes_by_strain):
     total = len(island_genes)
     n_hypo = counts["hypothetical"]
 
-    # Determine dominant non-hypothetical cargo
-    non_hypo = {k:v for k,v in counts.items() if k not in ("hypothetical","other")}
-    dominant = max(non_hypo, key=non_hypo.get) if non_hypo else \
-               ("hypothetical" if n_hypo > total*0.5 else "unknown")
+    # Determine dominant cargo, prioritizing informative categories.
+    # Regulatory genes are near-ubiquitous, so they only win when no
+    # informative cargo (defense/phage/mobility/metal/efflux/TA) is present.
+    INFORMATIVE = ["defense", "phage", "mobility", "metal", "efflux", "ta_system"]
+    informative_counts = {k: counts[k] for k in INFORMATIVE if counts.get(k, 0) > 0}
+    if informative_counts:
+        dominant = max(informative_counts, key=informative_counts.get)
+    elif counts.get("regulatory", 0) > 0:
+        dominant = "regulatory"
+    elif n_hypo > total * 0.5:
+        dominant = "hypothetical"
+    else:
+        dominant = "unknown"
+    if dominant == "ta_system":
+        dominant = "ta"
 
     return {
         "n_genes":        total,
