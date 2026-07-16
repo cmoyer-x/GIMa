@@ -567,7 +567,7 @@ def main():
     print(f"\nAge distribution:")
     for age in ["very_recent","recent","moderate","old"]:
         n = age_dist.get(age,0)
-        print(f"  {age:15}: {n:5,} ({100*n/total_kept:.1f}%)")
+        print(f"  {age:15}: {n:5,} ({100*n/total_kept:.1f}%)" if total_kept else f"  {age:15}: {n:5,}")
     print(f"{'='*60}")
     print(f"\nViewer JSON ready: {viewer_json_path}")
     print(f"Load this in the updated patient viewer with --island_catalog flag")
